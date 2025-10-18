@@ -1,0 +1,22 @@
+apiVersion: workspaces.jupyter.org/v1alpha1
+kind: Workspace
+metadata:
+  labels:
+    app.kubernetes.io/name: jupyter-k8s
+    app.kubernetes.io/managed-by: kustomize
+  name: workspace-with-lifecycle-hook
+spec:
+  displayName: "SageMaker Workspace with Lifecycle Hook"
+  image: "public.ecr.aws/sagemaker/sagemaker-distribution:3.4.3-cpu"
+  desiredStatus: "Running"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  lifecycle:
+    postStart:
+      exec:
+        command: ["/bin/bash", "-c", "echo 'Welcome to SageMaker Workspace! Created at $(date)' > /home/sagemaker-user/welcome.txt && echo 'Workspace initialized successfully' > /tmp/init.log"]

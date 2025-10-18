@@ -4,7 +4,7 @@
 namespace: jupyter-k8s-system # TODO consider if we need seperate namespace
 
 # Full domain for the application (required)
-domain: ""
+domain: "k8s-jupyterk-traefik-8f58aa93ad-336bffb9db7f7f28.elb.us-west-2.amazonaws.com"
 
 # [STORAGE] StorageClasses for Workspaces
 storageClass:
@@ -18,3 +18,72 @@ storageClass:
     parameters:
       type: gp3
       fsType: ext4
+
+# Authmiddleware configuration
+authmiddleware:
+  # Whether to deploy the authmiddleware component
+  enabled: true
+  # Number of replicas
+  replicas: 1
+  # Authmiddleware image settings
+  imagePullPolicy: Always
+  repository: docker.io
+  imageName: jupyter-k8s-auth
+  imageTag: latest
+  # Resource limits and requests
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 200m
+      memory: 128Mi
+  # JWT configuration
+  # Required: must be provided as base64 encoded string (generate with: openssl rand -base64 32)
+  jwtSigningKey: ""
+  jwtIssuer: "jupyter-k8s-auth"
+  jwtAudience: "workspace-users"
+  jwtExpiration: "1h"
+  jwtRefreshWindow: "15m"
+  jwtRefreshHorizon: "12h"
+  # Cookie configuration
+  cookieName: "workspace_auth"
+  cookieSecure: "true"
+  cookiePath: "/"
+  cookieMaxAge: "24h"
+  cookieHttpOnly: "true"
+  cookieSameSite: "lax"
+  # Path configuration
+  pathRegexPattern: "^(/workspaces/[^/]+/[^/]+)(?:/.*)?$"
+  maxCookiePaths: "20"
+  # CSRF configuration
+  # Required: must be provided as base64 encoded string (generate with: openssl rand -base64 32)
+  csrfAuthKey: ""
+  csrfCookieName: "workspace_csrf"
+  csrfCookieMaxAge: "1h"
+  csrfCookieSecure: "true"
+  # Server configuration
+  readTimeout: "10s"
+  writeTimeout: "10s"
+  shutdownTimeout: "30s"
+  # Bearer auth configuration
+  enableBearerAuth: true
+
+# Traefik configuration
+traefik:
+  # Always enabled for this chart
+  enabled: true
+  # Traefik deployment image repository
+  repository: docker.io
+  # Traefik deployment image name
+  imageName: traefik
+  # Traefik deployment image tag
+  imageTag: latest
+  # Number of traefik replicas
+  replicas: 1
+  # Redirect HTTP to HTTPS
+  redirectHttp: true
+  # Whether to configure traefik at 'debug' log level ('info' if omitted)
+  debug: true
+  # Allow cross-namespace middleware references
+  allowCrossNamespace: true

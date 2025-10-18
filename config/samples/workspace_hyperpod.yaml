@@ -1,0 +1,25 @@
+apiVersion: workspaces.jupyter.org/v1alpha1
+kind: Workspace
+metadata:
+  labels:
+    app.kubernetes.io/name: jupyter-k8s
+    app.kubernetes.io/managed-by: kustomize
+  name: workspace-hyperpod
+  namespace: jupyter-k8s-hyperpod
+spec:
+  displayName: "HyperPod Workspace with Bearer Auth"
+  image: jupyter/scipy-notebook:latest
+  desiredStatus: Running
+  accessStrategy:
+    name: hyperpod-access-strategy
+    namespace: default
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  containerConfig:
+    command: ["/bin/bash"]
+    args: ["-c", "start-notebook.sh --NotebookApp.token='' --NotebookApp.password='' --ip=0.0.0.0 --port=8888 --no-browser --allow-root"]

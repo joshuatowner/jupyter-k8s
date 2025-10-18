@@ -1,0 +1,58 @@
+apiVersion: workspaces.jupyter.org/v1alpha1
+kind: WorkspaceAccessStrategy
+metadata:
+  name: hyperpod-access-strategy
+  namespace: default
+spec:
+  displayName: HyperPod Bearer Auth Strategy
+  accessResourceNamespace: jupyter-k8s-hyperpod
+  accessResourceTemplates:
+    # The authorized route - tries token verification on already authenticated requests
+    - kind: IngressRoute
+      apiVersion: traefik.io/v1alpha1
+      namePrefix: authorized-route
+      template: |
+        spec:
+          entryPoints:
+            - websecure
+          routes:
+            - match: "Host(`k8s-jupyterk-traefik-8f58aa93ad-336bffb9db7f7f28.elb.us-west-2.amazonaws.com`) && PathPrefix(`/workspaces/{{ .Workspace.Namespace }}/{{ .Workspace.Name }}`)"
+              kind: Rule
+              priority: 100
+              middlewares:
+                - name: auth-headers
+                  namespace: jupyter-k8s-hyperpod
+                - name: authmiddleware-verify
+                  namespace: jupyter-k8s-hyperpod
+              services:
+                - name: "{{ .Service.Name }}"
+                  namespace: "{{ .Service.Namespace }}"
+                  port: 8888
+
+    # The unauthorized route - handles bearer-auth path for initial authentication
+    - kind: IngressRoute
+      apiVersion: traefik.io/v1alpha1
+      namePrefix: unauthorized-route
+      template: |
+        spec:
+          entryPoints:
+            - websecure
+          routes:
+            - match: "Host(`k8s-jupyterk-traefik-8f58aa93ad-336bffb9db7f7f28.elb.us-west-2.amazonaws.com`) && PathPrefix(`/workspaces/{{ .Workspace.Namespace }}/{{ .Workspace.Name }}/bearer-auth`)"
+              kind: Rule
+              priority: 110  # Higher priority specifically for bearer-auth paths
+              middlewares:
+                - name: auth-headers
+                  namespace: jupyter-k8s-hyperpod
+                - name: authmiddleware-auth
+                  namespace: jupyter-k8s-hyperpod
+                - name: strip-bearer-auth-suffix
+                  namespace: jupyter-k8s-hyperpod
+              services:
+                - name: "{{ .Service.Name }}"
+                  namespace: "{{ .Service.Namespace }}"
+                  port: 8888
+  mergeEnv:
+    - name: JUPYTER_BASE_URL
+      valueTemplate: "/workspaces/{{ .Workspace.Namespace }}/{{ .Workspace.Name }}/"
+  accessURLTemplate: "https://k8s-jupyterk-traefik-8f58aa93ad-336bffb9db7f7f28.elb.us-west-2.amazonaws.com/workspaces/{{ .Workspace.Namespace }}/{{ .Workspace.Name }}/bearer-auth"

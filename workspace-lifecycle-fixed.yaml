@@ -1,0 +1,25 @@
+apiVersion: workspaces.jupyter.org/v1alpha1
+kind: Workspace
+metadata:
+  labels:
+    app.kubernetes.io/name: jupyter-k8s
+    app.kubernetes.io/managed-by: kustomize
+  name: workspace-with-lifecycle-hook
+spec:
+  displayName: "Jupyter Workspace with Lifecycle Hook"
+  image: "jupyter/scipy-notebook:latest"
+  desiredStatus: "Running"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  containerConfig:
+    command: ["/bin/bash"]
+    args: ["-c", "start-notebook.sh --NotebookApp.token='' --NotebookApp.password='' --ip=0.0.0.0 --port=8888 --no-browser --allow-root"]
+  lifecycle:
+    postStart:
+      exec:
+        command: ["/bin/bash", "-c", "echo 'Welcome to Jupyter Workspace! Created at $(date)' > /home/jovyan/welcome.txt"]
