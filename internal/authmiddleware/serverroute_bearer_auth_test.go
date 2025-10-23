@@ -201,7 +201,7 @@ func TestHandleBearerAuthTokenPathMismatch(t *testing.T) {
 
 func TestHandleBearerAuthSuccess(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	
+
 	jwtHandler := &MockJWTHandler{
 		ValidateTokenFunc: func(tokenString string) (*Claims, error) {
 			return &Claims{

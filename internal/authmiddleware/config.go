@@ -6,7 +6,16 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
+)
+
+// JWTValidationType defines the type of JWT validation to use
+type JWTValidationType string
+
+const (
+	JWTValidationHMAC JWTValidationType = "hmac"
+	JWTValidationKMS  JWTValidationType = "kms"
 )
 
 // Environment variable names
@@ -19,7 +28,10 @@ const (
 	EnvTrustedProxies  = "TRUSTED_PROXIES"
 
 	// Auth configuration
-	EnvJwtSigningKey     = "JWT_SIGNING_KEY"
+	EnvJWTValidationType = "JWT_VALIDATION_TYPE" // "hmac" or "kms"
+	EnvJwtSigningKey     = "JWT_SIGNING_KEY"     // for HMAC validation
+	EnvKMSKeyId          = "KMS_KEY_ID"          // for KMS validation
+	EnvKMSRegion         = "KMS_REGION"          // for KMS validation
 	EnvJwtIssuer         = "JWT_ISSUER"
 	EnvJwtAudience       = "JWT_AUDIENCE"
 	EnvJwtExpiration     = "JWT_EXPIRATION"
@@ -60,6 +72,7 @@ const (
 	// DefaultTrustedProxies is a slice, defined in createDefaultConfig
 
 	// Auth defaults
+	DefaultJWTValidationType = JWTValidationHMAC // Default to HMAC for backward compatibility
 	DefaultJwtIssuer         = "workspaces-auth"
 	DefaultJwtAudience       = "workspace-users"
 	DefaultJwtExpiration     = 1 * time.Hour
@@ -98,7 +111,10 @@ type Config struct {
 	TrustedProxies  []string
 
 	// Auth configuration
-	JWTSigningKey     string
+	JWTValidationType JWTValidationType
+	JWTSigningKey     string // Used for HMAC validation
+	KMSKeyId          string // Used for KMS validation
+	KMSRegion         string // Used for KMS validation
 	JWTIssuer         string
 	JWTAudience       string
 	JWTExpiration     time.Duration
@@ -169,6 +185,7 @@ func createDefaultConfig() *Config {
 		TrustedProxies:  []string{"127.0.0.1", "::1"}, // Default trusted proxies
 
 		// Auth defaults
+		JWTValidationType: DefaultJWTValidationType,
 		JWTIssuer:         DefaultJwtIssuer,
 		JWTAudience:       DefaultJwtAudience,
 		JWTExpiration:     DefaultJwtExpiration,
@@ -241,11 +258,35 @@ func applyServerConfig(config *Config) error {
 
 // applyJWTConfig applies JWT-related environment variable overrides
 func applyJWTConfig(config *Config) error {
-	// Required JWT signing key
-	if key := os.Getenv(EnvJwtSigningKey); key != "" {
-		config.JWTSigningKey = key
-	} else {
-		return fmt.Errorf("%s environment variable must be set", EnvJwtSigningKey)
+	// JWT Validation Type
+	if validationType := os.Getenv(EnvJWTValidationType); validationType != "" {
+		switch strings.ToLower(validationType) {
+		case string(JWTValidationHMAC):
+			config.JWTValidationType = JWTValidationHMAC
+		case string(JWTValidationKMS):
+			config.JWTValidationType = JWTValidationKMS
+		default:
+			return fmt.Errorf("invalid %s: must be 'hmac' or 'kms'", EnvJWTValidationType)
+		}
+	}
+
+	// Validate required fields based on validation type
+	switch config.JWTValidationType {
+	case JWTValidationHMAC:
+		if key := os.Getenv(EnvJwtSigningKey); key != "" {
+			config.JWTSigningKey = key
+		} else {
+			return fmt.Errorf("%s environment variable must be set for HMAC validation", EnvJwtSigningKey)
+		}
+	case JWTValidationKMS:
+		if keyId := os.Getenv(EnvKMSKeyId); keyId != "" {
+			config.KMSKeyId = keyId
+		} else {
+			return fmt.Errorf("%s environment variable must be set for KMS validation", EnvKMSKeyId)
+		}
+		if region := os.Getenv(EnvKMSRegion); region != "" {
+			config.KMSRegion = region
+		}
 	}
 
 	if issuer := os.Getenv(EnvJwtIssuer); issuer != "" {

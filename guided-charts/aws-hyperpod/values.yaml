@@ -39,8 +39,14 @@ authmiddleware:
       cpu: 200m
       memory: 128Mi
   # JWT configuration
-  # Required: must be provided as base64 encoded string (generate with: openssl rand -base64 32)
+  # JWT validation type: "hmac" or "kms"
+  jwtValidationType: "kms"
+  # For HMAC validation: must be provided as base64 encoded string (generate with: openssl rand -base64 32)
   jwtSigningKey: ""
+  # For KMS validation: AWS KMS key ARN for JWT signing
+  kmsKeyId: "arn:aws:kms:us-west-2:632138803636:key/8bb2f29c-c3fe-4049-89d9-072480fddc9c"
+  # For KMS validation: AWS region for KMS key (optional, uses default AWS region if not set)
+  kmsRegion: "us-west-2"
   jwtIssuer: "jupyter-k8s-auth"
   jwtAudience: "workspace-users"
   jwtExpiration: "1h"

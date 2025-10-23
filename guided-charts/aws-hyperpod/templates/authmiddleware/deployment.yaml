@@ -70,11 +70,22 @@ spec:
             value: "{{ .Values.authmiddleware.writeTimeout }}"
           - name: SHUTDOWN_TIMEOUT
             value: "{{ .Values.authmiddleware.shutdownTimeout }}"
+          - name: JWT_VALIDATION_TYPE
+            value: "{{ .Values.authmiddleware.jwtValidationType }}"
+          {{- if eq .Values.authmiddleware.jwtValidationType "hmac" }}
           - name: JWT_SIGNING_KEY
             valueFrom:
               secretKeyRef:
                 name: authmiddleware-secrets
                 key: jwt-signing-key
+          {{- else if eq .Values.authmiddleware.jwtValidationType "kms" }}
+          - name: KMS_KEY_ID
+            value: "{{ .Values.authmiddleware.kmsKeyId }}"
+          {{- if .Values.authmiddleware.kmsRegion }}
+          - name: KMS_REGION
+            value: "{{ .Values.authmiddleware.kmsRegion }}"
+          {{- end }}
+          {{- end }}
           - name: JWT_ISSUER
             value: "{{ .Values.authmiddleware.jwtIssuer }}"
           - name: JWT_AUDIENCE

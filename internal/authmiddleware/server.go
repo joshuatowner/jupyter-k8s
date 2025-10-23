@@ -61,7 +61,7 @@ func (s *Server) Start() error {
 	go s.handleShutdown(idleConnsClosed)
 
 	// Start server
-	s.logger.Info("Starting authentication middleware service", "port", s.config.Port)
+	s.logger.Info("Starting authentication middleware service with JWT builder pattern", "port", s.config.Port, "version", "v2.0-jwt-builder")
 	if err := s.httpServer.ListenAndServe(); err != http.ErrServerClosed {
 		return fmt.Errorf("server error: %w", err)
 	}
