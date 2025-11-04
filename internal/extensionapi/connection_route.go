@@ -182,7 +182,7 @@ func validateWorkspaceConnectionRequest(req *connectionv1alpha1.WorkspaceConnect
 // generateVSCodeURL generates a VSCode connection URL using SSM remote access strategy
 // Returns (connectionType, connectionURL, error)
 func (s *ExtensionServer) generateVSCodeURL(r *http.Request, workspaceName, namespace string) (string, string, error) {
-	logger := ctrl.Log.WithName("vscode-handler")
+	logger := GetLoggerFromContext(r.Context()).WithName("vscode-handler")
 
 	// Get cluster ID from config (already validated earlier)
 	clusterId := s.config.ClusterId
