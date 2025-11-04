@@ -49,13 +49,15 @@ var _ = Describe("Template Validation", func() {
 					Name: templateName,
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Validation Test Template",
-					Description:  "Template for validation testing",
-					DefaultImage: "quay.io/jupyter/minimal-notebook:latest",
-					AllowedImages: []string{
-						"quay.io/jupyter/minimal-notebook:latest",
-						"quay.io/jupyter/scipy-notebook:latest",
-						"custom/allowed-image:v1",
+					DisplayName: "Validation Test Template",
+					Description: "Template for validation testing",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{
+						DefaultImage: "quay.io/jupyter/minimal-notebook:latest",
+						AllowedImages: []string{
+							"quay.io/jupyter/minimal-notebook:latest",
+							"quay.io/jupyter/scipy-notebook:latest",
+							"custom/allowed-image:v1",
+						},
 					},
 					DefaultResources: &corev1.ResourceRequirements{
 						Requests: corev1.ResourceList{
@@ -148,13 +150,15 @@ var _ = Describe("Template Validation", func() {
 					Name: minimalTemplateName,
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Minimal Template",
-					Description:  "Template without default resources",
-					DefaultImage: "quay.io/jupyter/minimal-notebook:latest", // Required field
-					// DefaultResources is intentionally omitted (nil)
-					AllowedImages: []string{
-						"quay.io/jupyter/minimal-notebook:latest",
+					DisplayName: "Minimal Template",
+					Description: "Template without default resources",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{
+						DefaultImage: "quay.io/jupyter/minimal-notebook:latest", // Required field
+						AllowedImages: []string{
+							"quay.io/jupyter/minimal-notebook:latest",
+						},
 					},
+					// DefaultResources is intentionally omitted (nil)
 					PrimaryStorage: &workspacev1alpha1.StorageConfig{
 						DefaultSize: resource.MustParse("10Gi"),
 					},
@@ -568,8 +572,10 @@ var _ = Describe("Template Validation", func() {
 						Name: restrictedTemplateName,
 					},
 					Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-						DisplayName:            "Restricted Template",
-						DefaultImage:           "quay.io/jupyter/minimal-notebook:latest", // Required field
+						DisplayName: "Restricted Template",
+						ImagePolicy: &workspacev1alpha1.ImagePolicy{
+							DefaultImage: "quay.io/jupyter/minimal-notebook:latest", // Required field
+						},
 						AllowSecondaryStorages: &[]bool{false}[0],
 					},
 				}
@@ -603,8 +609,8 @@ var _ = Describe("Template Validation", func() {
 						Name: "empty-image-template",
 					},
 					Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-						DisplayName:  "Empty Image Template",
-						DefaultImage: "", // Intentionally empty
+						DisplayName: "Empty Image Template",
+						ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: ""}, // Intentionally empty
 					},
 				}
 

@@ -6,9 +6,11 @@ metadata:
 spec:
   displayName: "Production Jupyter Notebook"
   description: "Secure, resource-controlled notebook for production workloads"
-  defaultImage: "jk8s-application-jupyter-uv:latest"
-  allowedImages:
-    - "jk8s-application-jupyter-uv:latest"
+  images:
+    defaultImage: "jk8s-application-jupyter-uv:latest"
+    allowedImages:
+      - "jk8s-application-jupyter-uv:latest"
+    allowCustomImages: false
   defaultResources:
     requests:
       cpu: "200m"

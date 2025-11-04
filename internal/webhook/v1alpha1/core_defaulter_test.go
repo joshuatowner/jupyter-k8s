@@ -34,7 +34,9 @@ var _ = Describe("CoreDefaulter", func() {
 		template = &workspacev1alpha1.WorkspaceTemplate{
 			ObjectMeta: metav1.ObjectMeta{Name: "test-template"},
 			Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-				DefaultImage:         "jupyter/base-notebook:latest",
+				ImagePolicy: &workspacev1alpha1.ImagePolicy{
+					DefaultImage: "jupyter/base-notebook:latest",
+				},
 				DefaultOwnershipType: "OwnerOnly",
 				DefaultContainerConfig: &workspacev1alpha1.ContainerConfig{
 					Command: []string{"/bin/bash"},

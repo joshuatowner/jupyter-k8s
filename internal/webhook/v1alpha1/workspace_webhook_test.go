@@ -501,8 +501,10 @@ var _ = Describe("Workspace Webhook", func() {
 			template = &workspacev1alpha1.WorkspaceTemplate{
 				ObjectMeta: metav1.ObjectMeta{Name: "test-template"},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					AllowedImages: []string{"jupyter/base-notebook:latest", "jupyter/scipy-notebook:latest"},
-					DefaultImage:  "jupyter/base-notebook:latest",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{
+						AllowedImages: []string{"jupyter/base-notebook:latest", "jupyter/scipy-notebook:latest"},
+						DefaultImage:  "jupyter/base-notebook:latest",
+					},
 				},
 			}
 		})
@@ -522,13 +524,13 @@ var _ = Describe("Workspace Webhook", func() {
 			})
 
 			It("should use default image when allowed list is empty", func() {
-				template.Spec.AllowedImages = []string{}
+				template.Spec.ImagePolicy.AllowedImages = []string{}
 				violation := validateImageAllowed("jupyter/base-notebook:latest", template)
 				Expect(violation).To(BeNil())
 			})
 
 			It("should reject when allowed list is empty and image doesn't match default", func() {
-				template.Spec.AllowedImages = []string{}
+				template.Spec.ImagePolicy.AllowedImages = []string{}
 				violation := validateImageAllowed("other/image:latest", template)
 				Expect(violation).NotTo(BeNil())
 				Expect(violation.Type).To(Equal(controller.ViolationTypeImageNotAllowed))
@@ -536,21 +538,21 @@ var _ = Describe("Workspace Webhook", func() {
 
 			It("should allow any image when AllowCustomImages is true", func() {
 				allowCustomImages := true
-				template.Spec.AllowCustomImages = &allowCustomImages
+				template.Spec.ImagePolicy.AllowCustomImages = &allowCustomImages
 				violation := validateImageAllowed("any/custom:image", template)
 				Expect(violation).To(BeNil())
 			})
 
 			It("should still enforce restrictions when AllowCustomImages is false", func() {
 				allowCustomImages := false
-				template.Spec.AllowCustomImages = &allowCustomImages
+				template.Spec.ImagePolicy.AllowCustomImages = &allowCustomImages
 				violation := validateImageAllowed("malicious/image:latest", template)
 				Expect(violation).NotTo(BeNil())
 				Expect(violation.Type).To(Equal(controller.ViolationTypeImageNotAllowed))
 			})
 
 			It("should enforce restrictions when AllowCustomImages is nil (default)", func() {
-				template.Spec.AllowCustomImages = nil
+				template.Spec.ImagePolicy.AllowCustomImages = nil
 				violation := validateImageAllowed("malicious/image:latest", template)
 				Expect(violation).NotTo(BeNil())
 				Expect(violation.Type).To(Equal(controller.ViolationTypeImageNotAllowed))

@@ -23,8 +23,8 @@ import (
 // applyCoreDefaults applies core workspace defaults from template to workspace
 func applyCoreDefaults(workspace *workspacev1alpha1.Workspace, template *workspacev1alpha1.WorkspaceTemplate) {
 	// Apply image defaults
-	if workspace.Spec.Image == "" && template.Spec.DefaultImage != "" {
-		workspace.Spec.Image = template.Spec.DefaultImage
+	if workspace.Spec.Image == "" && template.Spec.ImagePolicy != nil && template.Spec.ImagePolicy.DefaultImage != "" {
+		workspace.Spec.Image = template.Spec.ImagePolicy.DefaultImage
 	}
 
 	// Apply ownership type defaults

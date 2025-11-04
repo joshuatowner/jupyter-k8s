@@ -73,10 +73,12 @@ var _ = Describe("Event Recording", func() {
 					Name: "test-template",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Test Template",
-					DefaultImage: "allowed-image:latest",
-					AllowedImages: []string{
-						"allowed-image:latest",
+					DisplayName: "Test Template",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{
+						DefaultImage: "allowed-image:latest",
+						AllowedImages: []string{
+							"allowed-image:latest",
+						},
 					},
 				},
 			}
@@ -144,10 +146,12 @@ var _ = Describe("Event Recording", func() {
 					Name: "test-template-valid",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Test Template Valid",
-					DefaultImage: "allowed-image:latest",
-					AllowedImages: []string{
-						"allowed-image:latest",
+					DisplayName: "Test Template Valid",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{
+						DefaultImage: "allowed-image:latest",
+						AllowedImages: []string{
+							"allowed-image:latest",
+						},
 					},
 				},
 			}
@@ -221,8 +225,8 @@ var _ = Describe("Event Recording", func() {
 					Name: "bounded-template",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Bounded Template",
-					DefaultImage: "test-image:latest",
+					DisplayName: "Bounded Template",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: "test-image:latest"},
 					ResourceBounds: &workspacev1alpha1.ResourceBounds{
 						CPU: &workspacev1alpha1.ResourceRange{
 							Min: resource.MustParse("250m"),

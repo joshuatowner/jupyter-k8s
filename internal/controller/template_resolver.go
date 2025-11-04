@@ -102,9 +102,11 @@ func (tr *TemplateResolver) ValidateAndResolveTemplate(ctx context.Context, work
 
 	// Start with template defaults
 	// Require DefaultImage to be set in template
-	defaultImage := template.Spec.DefaultImage
-	if defaultImage == "" {
-		return nil, fmt.Errorf("template %s does not define a DefaultImage - templates must specify a default container image", template.Name)
+	var defaultImage string
+	if template.Spec.ImagePolicy != nil && template.Spec.ImagePolicy.DefaultImage != "" {
+		defaultImage = template.Spec.ImagePolicy.DefaultImage
+	} else {
+		return nil, fmt.Errorf("template %s does not define a DefaultImage in imagePolicy - templates must specify a default container image", template.Name)
 	}
 
 	allowSecondaryStorages := true
@@ -171,8 +173,13 @@ func (tr *TemplateResolver) validateAndApplyOverrides(ctx context.Context, resol
 	// Override image if workspace specifies one
 	if workspace.Spec.Image != "" {
 		// Note: defaultImage is already validated to be non-empty earlier in resolveTemplate
-		defaultImage := template.Spec.DefaultImage
-		if violation := tr.validateImageAllowed(workspace.Spec.Image, template.Spec.AllowedImages, defaultImage); violation != nil {
+		var allowedImages []string
+		var defaultImage string
+		if template.Spec.ImagePolicy != nil {
+			allowedImages = template.Spec.ImagePolicy.AllowedImages
+			defaultImage = template.Spec.ImagePolicy.DefaultImage
+		}
+		if violation := tr.validateImageAllowed(workspace.Spec.Image, allowedImages, defaultImage); violation != nil {
 			violations = append(violations, *violation)
 		} else {
 			resolved.Image = workspace.Spec.Image

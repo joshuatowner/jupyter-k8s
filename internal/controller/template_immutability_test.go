@@ -45,8 +45,8 @@ var _ = Describe("Template Immutability", func() {
 					Name: "immutable-template-1",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Template 1",
-					DefaultImage: "quay.io/jupyter/minimal-notebook:latest",
+					DisplayName: "Template 1",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: "quay.io/jupyter/minimal-notebook:latest"},
 				},
 			}
 			Expect(k8sClient.Create(ctx, template1)).To(Succeed())
@@ -56,8 +56,8 @@ var _ = Describe("Template Immutability", func() {
 					Name: "immutable-template-2",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Template 2",
-					DefaultImage: "quay.io/jupyter/scipy-notebook:latest",
+					DisplayName: "Template 2",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: "quay.io/jupyter/scipy-notebook:latest"},
 				},
 			}
 			Expect(k8sClient.Create(ctx, template2)).To(Succeed())
@@ -139,8 +139,8 @@ var _ = Describe("Template Immutability", func() {
 					Name: "protected-template",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Protected Template",
-					DefaultImage: "quay.io/jupyter/minimal-notebook:latest",
+					DisplayName: "Protected Template",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: "quay.io/jupyter/minimal-notebook:latest"},
 				},
 			}
 			Expect(k8sClient.Create(ctx, template)).To(Succeed())
@@ -209,8 +209,8 @@ var _ = Describe("Template Immutability", func() {
 					Name: "unused-template",
 				},
 				Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-					DisplayName:  "Unused Template",
-					DefaultImage: "quay.io/jupyter/minimal-notebook:latest",
+					DisplayName: "Unused Template",
+					ImagePolicy: &workspacev1alpha1.ImagePolicy{DefaultImage: "quay.io/jupyter/minimal-notebook:latest"},
 				},
 			}
 			Expect(k8sClient.Create(ctx, unusedTemplate)).To(Succeed())

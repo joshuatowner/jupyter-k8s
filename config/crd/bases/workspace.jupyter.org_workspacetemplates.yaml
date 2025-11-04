@@ -52,27 +52,12 @@ spec:
           spec:
             description: WorkspaceTemplateSpec defines the desired state of WorkspaceTemplate
             properties:
-              allowCustomImages:
-                default: false
-                description: |-
-                  AllowCustomImages allows workspaces to use any container image, bypassing the AllowedImages restriction
-                  When true, workspaces can specify any image regardless of the AllowedImages list
-                type: boolean
               allowSecondaryStorages:
                 default: true
                 description: |-
                   AllowSecondaryStorages controls whether workspaces using this template
                   can mount additional storage volumes beyond the primary storage
                 type: boolean
-              allowedImages:
-                description: |-
-                  AllowedImages is a list of container images that can be used with this template
-                  If empty, only DefaultImage is allowed (secure by default)
-                  If populated, workspace can override image with any from this list
-                items:
-                  type: string
-                maxItems: 50
-                type: array
               appType:
                 description: AppType specifies the application type for workspaces
                   using this template
@@ -1085,12 +1070,6 @@ spec:
                 - enabled
                 - timeoutMinutes
                 type: object
-              defaultImage:
-                description: DefaultImage is the default container image for workspaces
-                  using this template
-                maxLength: 500
-                minLength: 1
-                type: string
               defaultLifecycle:
                 description: DefaultLifecycle specifies default lifecycle hooks for
                   workspaces using this template
@@ -1614,6 +1593,34 @@ spec:
                     description: MinTimeoutMinutes is the minimum allowed timeout
                     type: integer
                 type: object
+              images:
+                description: ImagePolicy defines the image configuration and restrictions
+                  for workspaces using this template
+                properties:
+                  allowCustomImages:
+                    default: false
+                    description: |-
+                      AllowCustomImages allows workspaces to use any container image, bypassing the AllowedImages restriction
+                      When true, workspaces can specify any image regardless of the AllowedImages list
+                    type: boolean
+                  allowedImages:
+                    description: |-
+                      AllowedImages is a list of container images that can be used with this template
+                      If empty, only DefaultImage is allowed (secure by default)
+                      If populated, workspace can override image with any from this list
+                    items:
+                      type: string
+                    maxItems: 50
+                    type: array
+                  defaultImage:
+                    description: DefaultImage is the default container image for workspaces
+                      using this template
+                    maxLength: 500
+                    minLength: 1
+                    type: string
+                required:
+                - defaultImage
+                type: object
               primaryStorage:
                 description: PrimaryStorage defines storage configuration
                 properties:
@@ -1718,7 +1725,6 @@ spec:
                     type: object
                 type: object
             required:
-            - defaultImage
             - displayName
             type: object
         type: object

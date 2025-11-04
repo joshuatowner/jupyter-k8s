@@ -50,7 +50,9 @@ var _ = Describe("TemplateDefaulter", func() {
 				Name: "test-template",
 			},
 			Spec: workspacev1alpha1.WorkspaceTemplateSpec{
-				DefaultImage:         "jupyter/base-notebook:latest",
+				ImagePolicy: &workspacev1alpha1.ImagePolicy{
+					DefaultImage: "jupyter/base-notebook:latest",
+				},
 				DefaultOwnershipType: "Public",
 				DefaultResources: &corev1.ResourceRequirements{
 					Requests: corev1.ResourceList{

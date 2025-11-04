@@ -6,9 +6,11 @@ metadata:
 spec:
   displayName: "Jupyter Lab Template"
   description: "Template for Jupyter Lab with idle shutdown support"
-  defaultImage: "public.ecr.aws/sagemaker/sagemaker-distribution:3.2.0-cpu"
-  allowedImages:
-    - "public.ecr.aws/sagemaker/sagemaker-distribution:3.2.0-cpu"
+  images:
+    defaultImage: "public.ecr.aws/sagemaker/sagemaker-distribution:3.2.0-cpu"
+    allowedImages:
+      - "public.ecr.aws/sagemaker/sagemaker-distribution:3.2.0-cpu"
+    allowCustomImages: false
   defaultResources:
     requests:
       cpu: "1000m"

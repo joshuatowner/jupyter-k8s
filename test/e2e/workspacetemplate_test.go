@@ -568,11 +568,12 @@ metadata:
 spec:
   displayName: "Restricted Images Template"
   description: "Template that restricts custom images"
-  defaultImage: "jupyter/base-notebook:latest"
-  allowedImages:
-    - "jupyter/base-notebook:latest"
-    - "jupyter/scipy-notebook:latest"
-  allowCustomImages: false
+  images:
+    defaultImage: "jupyter/base-notebook:latest"
+    allowedImages:
+      - "jupyter/base-notebook:latest"
+      - "jupyter/scipy-notebook:latest"
+    allowCustomImages: false
 `
 			cmd := exec.Command("sh", "-c",
 				fmt.Sprintf("echo '%s' | kubectl apply -f -", templateYaml))
@@ -609,10 +610,11 @@ metadata:
 spec:
   displayName: "Custom Images Template"
   description: "Template that allows custom images"
-  defaultImage: "jupyter/base-notebook:latest"
-  allowedImages:
-    - "jupyter/base-notebook:latest"
-  allowCustomImages: true
+  images:
+    defaultImage: "jupyter/base-notebook:latest"
+    allowedImages:
+      - "jupyter/base-notebook:latest"
+    allowCustomImages: true
 `
 			cmd := exec.Command("sh", "-c",
 				fmt.Sprintf("echo '%s' | kubectl apply -f -", templateYaml))

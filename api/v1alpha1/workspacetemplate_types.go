@@ -35,24 +35,9 @@ type WorkspaceTemplateSpec struct {
 	// +optional
 	Description string `json:"description,omitempty"`
 
-	// DefaultImage is the default container image for workspaces using this template
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=500
-	DefaultImage string `json:"defaultImage"`
-
-	// AllowedImages is a list of container images that can be used with this template
-	// If empty, only DefaultImage is allowed (secure by default)
-	// If populated, workspace can override image with any from this list
-	// +kubebuilder:validation:MaxItems=50
+	// ImagePolicy defines the image configuration and restrictions for workspaces using this template
 	// +optional
-	AllowedImages []string `json:"allowedImages,omitempty"`
-
-	// AllowCustomImages allows workspaces to use any container image, bypassing the AllowedImages restriction
-	// When true, workspaces can specify any image regardless of the AllowedImages list
-	// +kubebuilder:default=false
-	// +optional
-	AllowCustomImages *bool `json:"allowCustomImages,omitempty"`
+	ImagePolicy *ImagePolicy `json:"images,omitempty"`
 
 	// DefaultResources specifies the default resource requirements
 	// +optional
@@ -121,6 +106,28 @@ type WorkspaceTemplateSpec struct {
 	// AppType specifies the application type for workspaces using this template
 	// +optional
 	AppType string `json:"appType,omitempty"`
+}
+
+// ImagePolicy defines image configuration and restrictions for workspaces
+type ImagePolicy struct {
+	// DefaultImage is the default container image for workspaces using this template
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=500
+	DefaultImage string `json:"defaultImage"`
+
+	// AllowedImages is a list of container images that can be used with this template
+	// If empty, only DefaultImage is allowed (secure by default)
+	// If populated, workspace can override image with any from this list
+	// +kubebuilder:validation:MaxItems=50
+	// +optional
+	AllowedImages []string `json:"allowedImages,omitempty"`
+
+	// AllowCustomImages allows workspaces to use any container image, bypassing the AllowedImages restriction
+	// When true, workspaces can specify any image regardless of the AllowedImages list
+	// +kubebuilder:default=false
+	// +optional
+	AllowCustomImages *bool `json:"allowCustomImages,omitempty"`
 }
 
 // ResourceBounds defines minimum and maximum resource limits
